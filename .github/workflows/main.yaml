@@ -1,0 +1,30 @@
+name: anypkgs
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout codes'
+      uses: actions/checkout@v1
+    - name: Get git log
+      id: git_log
+      uses: Edisonboy/latest-git-log-action@main
+      with:
+        tag: origin/master
+
+    - name: Send email
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{secrets.MAIL_ADDRESS}}
+        server_port: 465
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: Github Actions test
+        to: ${{secrets.MAIL_TO_USERNAME}}
+        from: ${{secrets.MAIL_USERNAME}}
+        body: ${{github.repository}} push log : ${{steps.git_log.outputs.log}}
