@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - main
 
 jobs:
   build:
@@ -27,4 +28,4 @@ jobs:
         subject: Github Actions test
         to: ${{secrets.MAIL_TO_USERNAME}}
         from: ${{secrets.MAIL_USERNAME}}
-        body: ${{github.repository}} push log : ${{steps.git_log.outputs.log}}
+        body: build job of ${{github.repository}} ${{steps.git_log.outputs.log}} completed sucessfully!
