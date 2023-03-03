@@ -87,7 +87,11 @@ jobs:
             tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz centos --remove-files
           fi
         done
-        sha256sum os-${{matrix.image}}-${{matrix.version}}-{amd64,arm64}.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+        if [ -f os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz ];then
+          sha256sum os-${{matrix.image}}-${{matrix.version}}-{amd64,arm64}.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+        else
+          sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+        fi
     - name: Release and upload packages
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
