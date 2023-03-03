@@ -9,11 +9,24 @@ on:
 env:
   APP_NAME: ospkgs
   DOCKER_REPO: devilf/ospkgs
-  OS_VERSION: 7.9.2009
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    matrix:
+      include:
+      - version: 7.9.2009
+        image: centos
+      - version: 7.8.2003
+        image: centos
+      - version: 7.7.1908
+        image: centos
+      - version: 7.6.1810
+        image: centos
+      - version: 7.5.1804
+        image: centos
     steps:
     - name: 'Checkout codes'
       uses: actions/checkout@v2
@@ -28,25 +41,25 @@ jobs:
         password: ${{secrets.DOCKER_HUB_PASSWORD}}
     - name: Get version
       run: echo APP_VERSION=`git describe --tags --always` >> $GITHUB_ENV
-    - name: Test
+    - name: Gen Dockerfile
       shell: bash
       run: |
-        ls -l
+        sed "s/OS_VERSION/${{matrix.version}}/g" build/template/Dockerfile.template-centos7 > Dockerfile.${{matrix.image}}-${{matrix.version}}
     - name: Build and push
       id: docker_build
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: build/template/Dockerfile.template-centos
+        file: Dockerfile.${{matrix.image}}-${{matrix.version}}
         push: ${{github.event_name != 'pull_request'}}
         platforms: |
           linux/arm64
           linux/amd64
-        build-args: |
-          APP_NAME=${{env.APP_NAME}}
-          APP_VERSION=${{env.APP_VERSION}}
+        # build-args: |
+        #   APP_NAME=${{env.APP_NAME}}
+        #   APP_VERSION=${{env.APP_VERSION}}
         tags: |
-          devilf/ospkgs:${{env.OS_VERSION}}
+          devilf/os-${{matrix.image}}:${{matrix.version}}
     # - name: Gen new dockerfile
     #   shell: bash
     #   run: |
