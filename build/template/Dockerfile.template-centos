@@ -1,0 +1,18 @@
+FROM centos:7.9.2009 as os-base
+
+RUN yum install -q -y yum-utils createrepo epel-release wget && \
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    yum makecache
+
+WORKDIR /centos/OS_VERSION
+
+COPY packages.yaml .
+COPY --from=mikefarah/yq /usr/bin/yq /usr/bin/yq
+
+RUN ARCH=$(uname -m) && \
+    yq eval '.centos[]' packages.yaml | xargs repotrack -p ${ARCH} && \
+    createrepo -d ${ARCH}
+
+FROM scratch
+
+COPY --from=os-base /centos/ /offline

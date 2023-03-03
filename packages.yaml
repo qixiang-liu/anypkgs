@@ -1,0 +1,17 @@
+centos:
+- wget
+- curl
+- lvm2
+- telnet
+- nfs-utils
+- net-tools
+- unzip
+- nmap-ncat
+- chrony
+- socat
+- ipvsadm
+- conntrack
+- bash-completion
+- ntpdate
+- device-mapper-persistent-data
+- haproxy
