@@ -17,7 +17,7 @@ FROM gcc as start-cmd
 COPY hello.c /
 
 WORKDIR /
-RUN gcc -o hello hello.c
+RUN gcc -o hello hello.c -static
 
 FROM scratch
 
