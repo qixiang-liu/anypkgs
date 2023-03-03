@@ -63,34 +63,32 @@ jobs:
         #   APP_VERSION=${{env.APP_VERSION}}
         tags: |
           devilf/os-${{matrix.image}}:${{matrix.version}}
-    # - name: Gen new dockerfile
-    #   shell: bash
-    #   run: |
-    #     echo -e "FROM scratch\nCOPY --from=${{ env.IMAGE_REPO }}/${{ matrix.image_name }}:${{ env.IMAGE_TAG }} / /" > Dockerfile
-    # - name: Build image to local
-    #   uses: docker/build-push-action@v2
-    #   with:
-    #     context: .
-    #     file: Dockerfile
-    #     platforms: |
-    #       linux/arm64
-    #       linux/amd64
-    #     outputs: type=local,dest=./
-    # - name: Prepare for upload package
-    #   shell: bash
-    #   run: |
-    #     mv linux_amd64/offline offline
-    #     tar -I pigz -cf offline-amd64.tar.gz offline --remove-files
-    #     mv linux_arm64/offline offline
-    #     tar -I pigz -cf offline-arm64.tar.gz offline --remove-files
-    #     sha256sum offline-{amd64,arm64}.tar.gz > offline.sha256sum.txt
-    # - name: Release and upload packages
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   uses: softprops/action-gh-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     files: |
-    #       offline-amd64.tar.gz
-    #       offline-arm64.tar.gz
-    #       offline.sha256sum.txt
+    - name: Gen new dockerfile
+      shell: bash
+      run: |
+        echo -e "FROM scratch\nCOPY --from=devilf/os-${{matrix.image}}:${{matrix.version}} / /" > Dockerfile.release.${{matrix.image}}-${{matrix.version}}
+    - name: Build image to local
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: Dockerfile.release.${{matrix.image}}-${{matrix.version}}
+        platforms: ${{matrix.platform}}
+        outputs: type=local,dest=./
+    - name: Prepare for upload package
+      shell: bash
+      run: |
+        mv linux_amd64/centos centos
+        tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz offline --remove-files
+        mv linux_arm64/centos centos
+        tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz offline --remove-files
+        sha256sum os-${{matrix.image}}-${{matrix.version}}-{amd64,arm64}.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+    - name: Release and upload packages
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: |
+          os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz
+          os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz
+          os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
