@@ -77,6 +77,9 @@ jobs:
     - name: Prepare for upload package
       shell: bash
       run: |
+        ls -l
+        ls -l linux_amd64
+        ls -l linux_arm64
         mv linux_amd64/centos centos
         tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz offline --remove-files
         mv linux_arm64/centos centos
