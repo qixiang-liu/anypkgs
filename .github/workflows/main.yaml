@@ -27,6 +27,10 @@ jobs:
         password: ${{secrets.DOCKER_HUB_PASSWORD}}
     - name: Get version
       run: echo APP_VERSION=`git describe --tags --always` >> $GITHUB_ENV
+    - name: Test
+      shell: bash
+      run: |
+        ls -l
     - name: Build and push
       id: docker_build
       uses: docker/build-push-action@v2
@@ -35,10 +39,10 @@ jobs:
         file: build/template/Dockerfile.template-centos
         push: true
         platforms: |
-          linux/arm
-          linux/amd
+          linux/arm64
+          linux/amd64
         build-args: |
           APP_NAME=${{env.APP_NAME}}
           APP_VERSION=${{env.APP_VERSION}}
         tags: |
-          devilf/ospkgs:latest
+          devilf/ospkgs:${{env.APP_VERSION}}
