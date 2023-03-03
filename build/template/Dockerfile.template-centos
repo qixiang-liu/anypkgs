@@ -16,11 +16,11 @@ RUN ARCH=$(uname -m) && \
 FROM gcc as start-cmd
 COPY hello.c /
 
-RUN gcc -o hello hello.c && \
-    chmod +x /hello
+WORKDIR /
+RUN gcc -o hello hello.c
 
 FROM scratch
 
 COPY --from=os-base /centos/ /offline/
-COPY --from=start-cmd /hello /hello
+COPY --from=start-cmd /hello /
 CMD ["/hello"]
