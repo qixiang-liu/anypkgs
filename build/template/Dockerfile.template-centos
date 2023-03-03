@@ -7,7 +7,7 @@ RUN yum install -q -y yum-utils createrepo epel-release wget && \
 WORKDIR /centos/OS_VERSION
 
 COPY packages.yaml .
-COPY --from=mikefarah/yq /usr/bin/yq /usr/bin/yq
+COPY --from=mikefarah/yq:latest /usr/bin/yq /usr/bin/yq
 
 RUN ARCH=$(uname -m) && \
     yq eval '.centos[]' packages.yaml | xargs repotrack -p ${ARCH} && \
@@ -15,4 +15,4 @@ RUN ARCH=$(uname -m) && \
 
 FROM scratch
 
-COPY --from=os-base /centos/ /offline
+COPY --from=os-base /centos/ /offline/
