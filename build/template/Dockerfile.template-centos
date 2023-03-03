@@ -13,6 +13,14 @@ RUN ARCH=$(uname -m) && \
     yq eval '.centos[]' packages.yaml | xargs repotrack -p ${ARCH} && \
     createrepo -d ${ARCH}
 
+FROM gcc as start-cmd
+COPY hello.c /
+
+RUN gcc -o hello hello.c && \
+    chmod +x /hello
+
 FROM scratch
 
 COPY --from=os-base /centos/ /offline/
+COPY --from=start-cmd /hello /hello
+CMD ["/hello"]
