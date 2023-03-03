@@ -13,14 +13,6 @@ RUN ARCH=$(uname -m) && \
     yq eval '.centos[]' packages.yaml | xargs repotrack -p ${ARCH} && \
     createrepo -d ${ARCH}
 
-FROM gcc as start-cmd
-COPY hello.c /
+FROM nginx:mainline-alpine-slim
 
-WORKDIR /
-RUN gcc -o hello hello.c -static
-
-FROM scratch
-
-COPY --from=os-base /centos/ /offline/
-COPY --from=start-cmd /hello /
-CMD ["/hello"]
+COPY --from=os-base /centos/ /usr/share/nginx/html/
