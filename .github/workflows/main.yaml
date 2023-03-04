@@ -147,6 +147,7 @@ jobs:
       run: |
         ls -l
         echo ${{ needs.create_tag.outputs.tag }}
+        echo "xxxxxx" > test.txt
     - name: Release and upload packages
       # if: startsWith(github.ref, 'refs/tags/')
       # https://github.com/softprops/action-gh-release
@@ -156,5 +157,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: v1.0.1
         name: ${{ needs.create_tag.outputs.tag }}
-        artifacts: "*.tar.gz,*.sha256sum.txt"
+        artifacts: "*.tar.gz,*.sha256sum.txt,test.txt"
         replacesArtifacts: true
