@@ -99,6 +99,7 @@ jobs:
           sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
         fi
   tag_version:
+    # 设置权限，参考: https://stackoverflow.com/questions/70435286/resource-not-accessible-by-integration-on-github-post-repos-owner-repo-ac
     permissions: write-all
     needs: build
     runs-on: ubuntu-20.04
@@ -154,8 +155,9 @@ jobs:
       with:
         fail_on_unmatched_files: false
         tag_name: v${{needs.tag_version.outputs.tag}}
-        release_name: v${{needs.tag_version.outputs.tag}}
         files: |
-          os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz
-          os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz
-          os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+          os-${{needs.build.matrix.image}}-${{needs.build.matrix.version}}-amd64.tar.gz
+
+          os-${{needs.build.strategy.matrix.image}}-${{needs.build.strategy.matrix.version}}-amd64.tar.gz
+          os-${{needs.build.strategy.matrix.image}}-${{needs.build.strategy.matrix.version}}-arm64.tar.gz
+          os-${{needs.build.strategy.matrix.image}}-${{needs.build.strategy.matrix.version}}.sha256sum.txt
