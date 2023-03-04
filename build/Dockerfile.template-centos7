@@ -1,10 +1,13 @@
 FROM centos:OS_VERSION as os-base
 
+ARG OS_MAIN_VERSION
+
+
 RUN yum install -q -y yum-utils createrepo epel-release wget && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
     yum makecache
 
-WORKDIR /centos/7
+WORKDIR /centos/${OS_MAIN_VERSION}/os
 
 COPY packages.yaml .
 COPY --from=mikefarah/yq:latest /usr/bin/yq /usr/bin/yq
@@ -13,6 +16,6 @@ RUN ARCH=$(uname -m) && \
     yq eval '.centos[]' packages.yaml | xargs repotrack -p ${ARCH} && \
     createrepo -d ${ARCH}
 
-FROM scratch
+FROM nginx:mainline-alpine-slim
 
-COPY --from=os-base /centos/ /centos/
+COPY --from=os-base /centos /usr/share/nginx/html

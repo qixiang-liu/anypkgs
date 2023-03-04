@@ -10,8 +10,7 @@ permissions:
   contents: write
 
 env:
-  APP_NAME: ospkgs
-  DOCKER_REPO: devilf/ospkgs
+  DOCKER_REPO: devilf/os-offline
 
 jobs:
   build:
@@ -23,18 +22,23 @@ jobs:
         - version: 7.9.2009
           image: centos
           platform: linux/amd64,linux/arm64
+          major_version: 7
         - version: 7.8.2003
           image: centos
           platform: linux/amd64
+          major_version: 7
         - version: 7.7.1908
           image: centos
           platform: linux/amd64
+          major_version: 7
         - version: 7.6.1810
           image: centos
           platform: linux/amd64
+          major_version: 7
         - version: 7.5.1804
           image: centos
           platform: linux/amd64
+          major_version: 7
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -55,8 +59,8 @@ jobs:
     - name: Gen Dockerfile
       shell: bash
       run: |
-        sed "s/OS_VERSION/${{matrix.version}}/g" build/template/Dockerfile.template-centos7 > Dockerfile.${{matrix.image}}-${{matrix.version}}
-    - name: Build and push
+        sed "s/OS_VERSION/${{matrix.version}}/g" build/Dockerfile.template-centos${{ matrix.major_version }} > Dockerfile.${{matrix.image}}-${{matrix.version}}
+    - name: Build image
       id: docker_build
       # 多架构构建
       # https://github.com/docker/build-push-action
@@ -66,43 +70,42 @@ jobs:
         file: Dockerfile.${{matrix.image}}-${{matrix.version}}
         push: true
         platforms: ${{matrix.platform}}
-        # build-args: |
-        #   APP_NAME=${{env.APP_NAME}}
-        #   APP_VERSION=${{env.APP_VERSION}}
+        build-args: |
+          OS_MAIN_VERSION=${{ matrix.major_version }}
         tags: |
-          devilf/os-${{matrix.image}}:${{matrix.version}}
-    - name: Gen new dockerfile
-      shell: bash
-      run: |
-        echo -e "FROM scratch\nCOPY --from=devilf/os-${{matrix.image}}:${{matrix.version}} / /" > Dockerfile.release.${{matrix.image}}-${{matrix.version}}
-    - name: Build image to local
-      # https://github.com/docker/build-push-action
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        file: Dockerfile.release.${{matrix.image}}-${{matrix.version}}
-        platforms: ${{matrix.platform}}
-        outputs: type=local,dest=./
-    - name: Prepare for upload package
-      shell: bash
-      run: |
-        ls -l
-        platform=(amd64 arm64)
-        for p in ${platform[@]};do
-          if [ -d linux_${p}/centos ];then
-            mv linux_${p}/centos centos
-            tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-${p}.tar.gz centos --remove-files
-          elif [ -d centos ];then
-            tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz centos --remove-files
-          fi
-        done
-        if [ -f os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz ];then
-          sha256sum os-${{matrix.image}}-${{matrix.version}}-{amd64,arm64}.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
-        else
-          sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
-        fi
-        echo "xxxxxxxxxxxxxx"
-        ls -l
+          ${{ env.DOCKER_REPO }}:v${{matrix.version}}-${{matrix.image}}
+
+        # - name: Gen new dockerfile
+        #   shell: bash
+        #   run: |
+        #     echo -e "FROM scratch\nCOPY --from=devilf/os-${{matrix.image}}:${{matrix.version}} / /" > Dockerfile.release.${{matrix.image}}-${{matrix.version}}
+
+        # - name: Build image to local
+        #   # https://github.com/docker/build-push-action
+        #   uses: docker/build-push-action@v4
+        #   with:
+        #     context: .
+        #     file: Dockerfile.release.${{matrix.image}}-${{matrix.version}}
+        #     platforms: ${{matrix.platform}}
+        #     outputs: type=local,dest=./
+
+        # - name: Prepare for upload package
+        #   shell: bash
+        #   run: |
+        #     platform=(amd64 arm64)
+        #     for p in ${platform[@]};do
+        #       if [ -d linux_${p}/centos ];then
+        #         mv linux_${p}/centos centos
+        #         tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-${p}.tar.gz centos --remove-files
+        #       elif [ -d centos ];then
+        #         tar -I pigz -cf os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz centos --remove-files
+        #       fi
+        #     done
+        #     if [ -f os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz ];then
+        #       sha256sum os-${{matrix.image}}-${{matrix.version}}-{amd64,arm64}.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+        #     else
+        #       sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
+        #     fi
   create_tag:
     runs-on: ubuntu-latest
     needs: build
@@ -138,24 +141,25 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CUSTOM_TAG: ${{ steps.version.outputs.value }}
-  publish_release:
-    runs-on: ubuntu-latest
-    needs: create_tag
-    steps:
-    - name: Prepare for upload package
-      shell: bash
-      run: |
-        ls -l
-        echo ${{ needs.create_tag.outputs.tag }}
-        echo "xxxxxx" > test.txt
-    - name: Release and upload packages
-      # if: startsWith(github.ref, 'refs/tags/')
-      # https://github.com/softprops/action-gh-release
-      # uses: softprops/action-gh-release@v1
-      uses: ncipollo/release-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: v1.0.1
-        name: ${{ needs.create_tag.outputs.tag }}
-        artifacts: "test.txt"
-        replacesArtifacts: true
+
+  # publish_release:
+  #   runs-on: ubuntu-latest
+  #   needs: create_tag
+  #   steps:
+  #   - name: Prepare for upload package
+  #     shell: bash
+  #     run: |
+  #       ls -l
+  #       echo ${{ needs.create_tag.outputs.tag }}
+  #       echo "xxxxxx" > test.txt
+  #   - name: Release and upload packages
+  #     # if: startsWith(github.ref, 'refs/tags/')
+  #     # https://github.com/softprops/action-gh-release
+  #     # uses: softprops/action-gh-release@v1
+  #     uses: ncipollo/release-action@v1
+  #     with:
+  #       token: ${{ secrets.GITHUB_TOKEN }}
+  #       tag: v1.0.1
+  #       name: ${{ needs.create_tag.outputs.tag }}
+  #       artifacts: "test.txt"
+  #       replacesArtifacts: true
