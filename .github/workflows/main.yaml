@@ -100,6 +100,8 @@ jobs:
         else
           sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
         fi
+        echo "xxxxxxxxxxxxxx"
+        ls -l
     - name: Get version and tag info
       id: version
       # return value
