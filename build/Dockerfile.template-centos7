@@ -15,8 +15,8 @@ COPY --from=mikefarah/yq:latest /usr/bin/yq /usr/bin/yq
 
 RUN ARCH=$(uname -m) && \
     yq eval '.packages.common[]' packages.yaml | xargs repotrack -p ${ARCH} && \
-    yq eval '.packages.yum.docker[]' packages.yaml | xargs repotrack -p ${ARCH} && \
-    yq eval '.packages.yum.kubernetes[]' packages.yaml | xargs repotrack -p ${ARCH} && \
+    yq eval '.packages.yum.docker[]' packages.yaml | xargs yumdownloader --resolve --destdir=./${ARCH} && \
+    yq eval '.packages.yum.kubernetes[]' packages.yaml | xargs yumdownloader --resolve --destdir=./${ARCH} && \
     createrepo -d ${ARCH}
 
 FROM nginx:mainline-alpine-slim
