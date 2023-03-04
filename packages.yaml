@@ -1,19 +1,28 @@
-centos:
-- wget
-- curl
-- lvm2
-- telnet
-- nfs-utils
-- net-tools
-- unzip
-- nmap-ncat
-- chrony
-- socat
-- ipvsadm
-- conntrack
-- bash-completion
-- ntpdate
-- device-mapper-persistent-data
-- haproxy
-
+packages:
+  common:
+  - wget
+  - curl
+  - lvm2
+  - telnet
+  - nfs-utils
+  - net-tools
+  - unzip
+  - nmap-ncat
+  - chrony
+  - socat
+  - ipvsadm
+  - conntrack
+  - bash-completion
+  - ntpdate
+  - device-mapper-persistent-data
+  yum:
+    docker:
+    - docker-ce-19.03.14
+    - docker-ce-cli-19.03.14
+    - containerd.io
+    kubernetes:
+    - kubelet-1.18.19
+    - kubectl-1.18.19
+    - kubeadm-1.18.19
+    - kubernetes-cni-0.8.7
 

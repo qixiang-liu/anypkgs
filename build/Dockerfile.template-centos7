@@ -2,6 +2,7 @@ FROM centos:OS_VERSION as os-base
 
 ARG OS_MAIN_VERSION
 
+COPY repos/centos/kubernetes.repo /etc/yum.repos.d/kubernetes.repo
 
 RUN yum install -q -y yum-utils createrepo epel-release wget && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
@@ -13,7 +14,9 @@ COPY packages.yaml .
 COPY --from=mikefarah/yq:latest /usr/bin/yq /usr/bin/yq
 
 RUN ARCH=$(uname -m) && \
-    yq eval '.centos[]' packages.yaml | xargs repotrack -p ${ARCH} && \
+    yq eval '.packages.common[]' packages.yaml | xargs repotrack -p ${ARCH} && \
+    yq eval '.packages.yum.docker[]' packages.yaml | xargs repotrack -p ${ARCH} && \
+    yq eval '.packages.yum.kubernetes[]' packages.yaml | xargs repotrack -p ${ARCH} && \
     createrepo -d ${ARCH}
 
 FROM nginx:mainline-alpine-slim
