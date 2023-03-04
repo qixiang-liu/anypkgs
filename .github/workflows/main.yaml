@@ -149,7 +149,7 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ needs.create_tag.outputs.tag }}
+        tag: v1.0.1
         name: ${{ needs.create_tag.outputs.tag }}
         artifacts: "*.tar.gz,*.sha256sum.txt"
         replacesArtifacts: true
