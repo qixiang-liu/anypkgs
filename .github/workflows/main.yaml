@@ -127,6 +127,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CUSTOM_TAG: ${{ steps.version.outputs.value }}
+
     - name: Release and upload packages
       # if: startsWith(github.ref, 'refs/tags/')
       # https://github.com/softprops/action-gh-release
@@ -134,8 +135,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        fail_on_unmatched_files: true
-        tag_name: v${{ steps.version.outputs.value }}
+        fail_on_unmatched_files: false
+        tag_name: ${{ steps.version.outputs.value }}
         files: |
           os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz
           os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz
