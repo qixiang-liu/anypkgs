@@ -13,6 +13,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
+    outputs:
+      tag: ${{ steps.tag.outputs.new_tag }}
     strategy:
       fail-fast: false
       matrix:
@@ -98,18 +100,6 @@ jobs:
         else
           sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
         fi
-  tag_version:
-    # 设置权限，参考: https://stackoverflow.com/questions/70435286/resource-not-accessible-by-integration-on-github-post-repos-owner-repo-ac
-    permissions: write-all
-    needs: build
-    runs-on: ubuntu-20.04
-    outputs:
-      tag: ${{ steps.tag.outputs.new_tag }}
-    steps:
-    - name: Checkout dist branch
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     - name: Get version and tag info
       id: version
       # return value
@@ -127,7 +117,6 @@ jobs:
         tag: ${{ steps.version.outputs.value }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Tag version
       id: tag
       if: ${{ steps.check_tag.outputs.exists == 'false' }}
@@ -136,18 +125,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CUSTOM_TAG: ${{ steps.version.outputs.value }}
-
-    # - name: Check created tag
-    #   id: check_tagged
-    #   run: |
-    #     echo "::set-output name=tagged::${{ (steps.check_tag.outputs.exists == 'false') && (steps.tag.outputs.new_tag == steps.tag.outputs.tag) }}"
-  create_release:
-    needs:
-    - build
-    - tag_version
-    # if: ${{ needs.tag_version.outputs.tagged == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
     - name: Release and upload packages
       # if: startsWith(github.ref, 'refs/tags/')
       # https://github.com/softprops/action-gh-release
@@ -156,10 +133,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         fail_on_unmatched_files: false
-        tag_name: v${{needs.tag_version.outputs.tag}}
+        tag_name: v${{ steps.version.outputs.value }}
         files: |
-          os-${{needs.build.matrix.image}}-${{needs.build.matrix.version}}-amd64.tar.gz
-
-          os-${{needs.build.strategy.matrix.image}}-${{needs.build.strategy.matrix.version}}-amd64.tar.gz
-          os-${{needs.build.strategy.matrix.image}}-${{needs.build.strategy.matrix.version}}-arm64.tar.gz
-          os-${{needs.build.strategy.matrix.image}}-${{needs.build.strategy.matrix.version}}.sha256sum.txt
+          os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz
+          os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz
+          os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
