@@ -157,5 +157,5 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: v1.0.1
         name: ${{ needs.create_tag.outputs.tag }}
-        artifacts: "*.tar.gz,*.sha256sum.txt,test.txt"
+        artifacts: "test.txt"
         replacesArtifacts: true
