@@ -98,6 +98,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        fail_on_unmatched_files: false
         files: |
           os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz
           os-${{matrix.image}}-${{matrix.version}}-arm64.tar.gz
