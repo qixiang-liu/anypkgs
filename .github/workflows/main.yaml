@@ -93,7 +93,7 @@ jobs:
           sha256sum os-${{matrix.image}}-${{matrix.version}}-amd64.tar.gz > os-${{matrix.image}}-${{matrix.version}}.sha256sum.txt
         fi
     - name: Release and upload packages
-      if: startsWith(github.ref, 'refs/tags/')
+      if: ${{ success() }}
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
