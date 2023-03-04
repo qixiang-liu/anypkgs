@@ -6,6 +6,9 @@ on:
     - master
     - main
 
+permissions:
+  contents: write
+
 env:
   APP_NAME: ospkgs
   DOCKER_REPO: devilf/ospkgs
