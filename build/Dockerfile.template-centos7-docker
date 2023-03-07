@@ -16,6 +16,8 @@ RUN yq eval '.packages.yum.docker[]' packages.yaml | xargs yumdownloader --resol
 
 FROM alpine
 
+ARG OS_MAIN_VERSION
+
 COPY --from=docker-base /centos/${OS_MAIN_VERSION}/docker/docker.tar.gz /docker
 
 CMD [ "sh", "-c", "echo $HOME" ]
