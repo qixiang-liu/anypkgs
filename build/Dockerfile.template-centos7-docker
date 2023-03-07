@@ -16,7 +16,7 @@ RUN ARCH=$(uname -m) && \
 
 WORKDIR /centos/${OS_MAIN_VERSION}/docker/${ARCH}
 
-RUN tar zcvf docker.tar.gz *.rpm
+RUN tar zcvf docker.tar.gz *
 
 FROM alpine
 
