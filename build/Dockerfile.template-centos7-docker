@@ -18,6 +18,6 @@ FROM alpine
 
 ARG OS_MAIN_VERSION
 
-COPY --from=docker-base /centos/${OS_MAIN_VERSION}/docker/docker.tar.gz /docker
+COPY --from=docker-base /centos/${OS_MAIN_VERSION}/docker/docker.tar.gz /docker/
 
 CMD [ "sh", "-c", "echo $HOME" ]
