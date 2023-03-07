@@ -53,9 +53,9 @@ jobs:
     - name: Login to aliyun registry
       uses: docker/login-action@v2
       with:
-        registry: ${{secrets.REPO_ADDR}}
-        username: ${{secrets.REPO_USERNAME}}
-        password: ${{secrets.REPO_PASSWORD}}
+        # registry: ${{secrets.REPO_ADDR}}
+        username: ${{secrets.DOCKER_HUB_USERNAME}}
+        password: ${{secrets.DOCKER_HUB_PASSWORD}}
     - name: Get version
       run: echo APP_VERSION=`git describe --tags --always` >> $GITHUB_ENV
     - name: Gen Dockerfile
@@ -76,7 +76,7 @@ jobs:
         build-args: |
           OS_MAIN_VERSION=${{ matrix.major_version }}
         tags: |
-          ${{secrets.REPO_ADDR}}/${{secrets.REPO_NAMESPACE}}/${{ env.REPO_NAME }}:v${{matrix.version}}-${{matrix.image}}
+          ${{env.DOCKER_REPO}}:v${{matrix.version}}-${{matrix.image}}
     - name: Build image for docker
       id: docker_build
       # 多架构构建
@@ -90,7 +90,7 @@ jobs:
         build-args: |
           OS_MAIN_VERSION=${{ matrix.major_version }}
         tags: |
-          ${{secrets.REPO_ADDR}}/${{secrets.REPO_NAMESPACE}}/${{ env.REPO_NAME }}:v${{matrix.version}}-docker
+          ${{env.DOCKER_REPO}}:v${{matrix.version}}-docker
 
         # - name: Gen new dockerfile
         #   shell: bash
