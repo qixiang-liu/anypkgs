@@ -1,0 +1,25 @@
+FROM centos:OS_VERSION as docker-base
+
+ARG OS_MAIN_VERSION
+
+RUN yum install -q -y yum-utils createrepo epel-release wget && \
+    yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    yum makecache
+
+WORKDIR /centos/${OS_MAIN_VERSION}/docker
+
+COPY packages.yaml .
+COPY --from=mikefarah/yq:latest /usr/bin/yq /usr/bin/yq
+
+RUN ARCH=$(uname -m) && \
+    yq eval '.packages.yum.docker[]' packages.yaml | xargs yumdownloader --resolve --destdir=./${ARCH}
+
+WORKDIR /centos/${OS_MAIN_VERSION}/docker/${ARCH}
+
+RUN tare zcvf docker.tar.gz *.rpm
+
+FROM alpine
+
+COPY --from=docker-base /centos/${OS_MAIN_VERSION}/docker/${ARCH}/docker.tar.gz /docker
+
+CMD [ "sh", "-c", "echo $HOME" ]
