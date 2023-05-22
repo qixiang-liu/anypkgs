@@ -1,38 +1,40 @@
 packages:
   common:
-  - wget
-  - curl
-  - lvm2
-  - telnet
-  - nfs-utils
-  - net-tools
-  - unzip
-  - nmap-ncat
-  - chrony
-  - socat
-  - ipvsadm
-  - conntrack
-  - bash-completion
-  - ntpdate
-  - device-mapper-persistent-data
+    - wget
+    - curl
+    - lvm2
+    - telnet
+    - nfs-utils
+    - net-tools
+    - unzip
+    - nmap-ncat
+    - chrony
+    - socat
+    - ipvsadm
+    - conntrack
+    - bash-completion
+    - ntpdate
+    - device-mapper-persistent-data
   yum:
     docker:
-    - docker-ce-19.03.14
-    - docker-ce-cli-19.03.14
-    - audit-libs-python-2.8.5
-    - checkpolicy-2.5
-    - containerd.io-1.6.6
-    - container-selinux-2.119.2
-    - libcgroup-0.41
-    - libseccomp-2.3.1
-    - libsemanage-python-2.5
-    - policycoreutils-python-2.5
-    - python-IPy-0.75
-    - setools-libs-3.3.8
+      - docker-ce-19.03.14
+      - docker-ce-cli-19.03.14
+      - audit-libs-python-2.8.5
+      - checkpolicy-2.5
+      - containerd.io-1.6.6
+      - container-selinux-2.119.2
+      - libcgroup-0.41
+      - libseccomp-2.3.1
+      - libsemanage-python-2.5
+      - policycoreutils-python-2.5
+      - python-IPy-0.75
+      - setools-libs-3.3.8
     kubernetes:
-    - kubelet-1.18.19
-    - kubectl-1.18.19
-    - kubeadm-1.18.19
-    - kubernetes-cni-0.8.7
-    - cri-tools-1.19.0
-
+      - kubelet-1.18.19
+      - kubectl-1.18.19
+      - kubeadm-1.18.19
+      - kubernetes-cni-0.8.7
+      - cri-tools-1.19.0
+    kernel:
+      - kernel-lt
+      - kernel-lt-devel
