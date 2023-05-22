@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 env:
-  DOCKER_REPO: devilf/deployengine
+  DOCKER_REPO: comqx/deployengine
   REPO_NAME: deployengine
 
 jobs:
