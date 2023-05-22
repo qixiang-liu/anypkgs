@@ -34,11 +34,6 @@ jobs:
         password: ${{secrets.DOCKER_HUB_PASSWORD}}
     - name: Get version
       run: echo APP_VERSION=`git describe --tags --always` >> $GITHUB_ENV
-    # - name: Gen Dockerfile
-    #   shell: bash
-    #   run: |
-    #     sed "s/OS_VERSION/${{matrix.version}}/g" build/Dockerfile.template-centos${{ matrix.major_version }}-os > Dockerfile.${{matrix.image}}-${{matrix.version}}-os
-    #     sed "s/OS_VERSION/${{matrix.version}}/g" build/Dockerfile.template-centos${{ matrix.major_version }}-docker > Dockerfile.${{matrix.image}}-${{matrix.version}}-docker
     - name: Build image for os
       id: os_build
       # 多架构构建
@@ -50,4 +45,4 @@ jobs:
         push: true
         platforms: linux/amd64,linux/arm64
         tags: |
-          ${{env.DOCKER_REPO}}:v${{matrix.version}}-${{matrix.image}}
+          ${{env.DOCKER_REPO}}:jdk8u362-b09-ubuntu
