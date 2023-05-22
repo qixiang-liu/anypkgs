@@ -10,4 +10,6 @@ RUN set -ex && \
     chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
     rm -rf /var/cache/apt/*
     
+    
+    
 ENV TZ=Asia/Shanghai
