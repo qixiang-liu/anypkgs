@@ -1,10 +1,13 @@
-FROM adoptopenjdk/openjdk8:jdk8u362-b09-ubuntu
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-    echo "Asia/Shanghai" > /etc/timezone && \
-    #sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list && \
-    apt-get clean && \
-    apt-get update && apt-get upgrade -y  && \
+FROM openjdk:8-jdk-slim
+
+RUN set -ex && \
+    apt-get update && \
     ln -s /lib /lib64 && \
-    apt install -y  bash tini jq   libc6 libpam-modules libnss3  && \
+    apt install -y bash tini libc6 libpam-modules libnss3  curl jq wget && \
+    rm /bin/sh && \
+    ln -sv /bin/bash /bin/sh && \
     echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su && \
-    chgrp root /etc/passwd && chmod ug+rw /etc/passwd
+    chgrp root /etc/passwd && chmod ug+rw /etc/passwd && \
+    rm -rf /var/cache/apt/*
+    
+ENV TZ=Asia/Shanghai
