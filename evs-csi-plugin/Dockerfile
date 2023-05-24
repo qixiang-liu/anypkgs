@@ -6,5 +6,4 @@ COPY evs-csi-plugin /bin/
 
 RUN yum install -y ca-certificates file tzdata nfs-utils xfsprogs e4fsprogs nc pciutils && chmod 777 /bin/evs-csi-plugin
 
-CMD ["/bin/evs-csi-plugin"]
-# ENTRYPOINT ["/bin/evs-csi-plugin"]
+ENTRYPOINT ["/bin/evs-csi-plugin"]
