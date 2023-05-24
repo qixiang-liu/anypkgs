@@ -41,8 +41,8 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: Dockerfile
+        file: ./evs-csi-plugin/Dockerfile
         push: true
         platforms: linux/amd64,linux/arm64
         tags: |
-          ${{env.DOCKER_REPO}}:jdk8u362-b09-ubuntu
+          ${{env.DOCKER_REPO}}:evs-csi-plugin-0.1.6
