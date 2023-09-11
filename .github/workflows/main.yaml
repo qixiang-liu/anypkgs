@@ -10,8 +10,8 @@ permissions:
   contents: write
 
 env:
-  DOCKER_REPO: comqx/evs-csi-plugin
-  REPO_NAME: evs-csi-plugin
+  DOCKER_REPO: comqx/deployengine
+  REPO_NAME: deployengine
 
 jobs:
   build:
@@ -41,8 +41,8 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./evs-csi-plugin/Dockerfile
+        file: Dockerfile
         push: true
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64,linux/arm64/v8
         tags: |
-          ${{env.DOCKER_REPO}}:v0.1.6
+          ${{env.DOCKER_REPO}}:jdk8u362-b09-ubuntu
